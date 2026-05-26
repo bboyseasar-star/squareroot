@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>鬼リピ 〜平方根〜</title>
+    
+    <!-- ファビコン/アイコン等用 (FontAwesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 外部スタイルシート -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- MathJax設定（必ずscript読み込み前に配置） -->
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            chtml: { scale: 1.25 },
+            startup: { 
+                typeset: true // 初期起動時およびロード時に自動で画面全体の数式を変換する
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+    
+    <!-- 演出用ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<!-- 背景の数式浮遊エフェクト -->
+<div class="bg-symbols" id="bg-symbols">
+    <span class="bg-symbol" style="left:5vw; font-size:2rem; animation-duration:12s; animation-delay:0s;">\(\sqrt{2}\)</span>
+    <span class="bg-symbol" style="left:15vw; font-size:1.6rem; animation-duration:15s; animation-delay:3s;">\(\pm\)</span>
+    <span class="bg-symbol" style="left:28vw; font-size:2.4rem; animation-duration:18s; animation-delay:1s;">\(x^2\)</span>
+    <span class="bg-symbol" style="left:40vw; font-size:1.8rem; animation-duration:11s; animation-delay:5s;">\(\sqrt{x}\)</span>
+    <span class="bg-symbol" style="left:55vw; font-size:2.2rem; animation-duration:14s; animation-delay:2s;">\(\sqrt{3}\)</span>
+    <span class="bg-symbol" style="left:68vw; font-size:1.5rem; animation-duration:16s; animation-delay:4s;">\(\pi\)</span>
+    <span class="bg-symbol" style="left:80vw; font-size:2.5rem; animation-duration:13s; animation-delay:6s;">\(a^2\)</span>
+    <span class="bg-symbol" style="left:92vw; font-size:1.7rem; animation-duration:17s; animation-delay:2s;">\(<\)</span>
+</div>
+
+<div id="app">
+    <!-- 1. スタート画面 -->
+    <div id="start-screen" class="screen active">
+        <div class="title-container animate-fade-in">
+            <h1 class="title">鬼リピ</h1>
+            <p class="subtitle">〜平方根のマスターへの道〜 ✨</p>
+        </div>
+        
+        <!-- スタート画面の左右分割コンテンツ -->
+        <div class="start-content-layout animate-fade-in" style="animation-delay: 0.1s;">
+            <!-- 左側：コース選択 -->
+            <div class="level-section">
+                <div class="level-card" onclick="startDrill(1)" id="card-level1">
+                    <div class="level-info">
+                        <div class="level-icon"><i class="fas fa-seedling"></i></div>
+                        <div class="level-text">
+                            <h3>レベル1：平方根の基本</h3>
+                            <p>「16の平方根は？」や「\(\sqrt{49}\) を根号を使わずに表す」問題に挑戦！</p>
+                        </div>
+                    </div>
+                    <div class="clear-badge"><i class="fas fa-crown"></i> CLEAR</div>
+                </div>
+                
+                <div class="level-card" onclick="startDrill(2)" id="card-level2">
+                    <div class="level-info">
+                        <div class="level-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="level-text">
+                            <h3>レベル2：根号を含む数の2乗</h3>
+                            <p>「\((-\sqrt{7})^2\)」など、平方根の2乗の性質を使った計算問題！</p>
+                        </div>
+                    </div>
+                    <div class="clear-badge"><i class="fas fa-crown"></i> CLEAR</div>
+                </div>
+                
+                <div class="level-card" onclick="startDrill(3)" id="card-level3">
+                    <div class="level-info">
+                        <div class="level-icon"><i class="fas fa-mountain"></i></div>
+                        <div class="level-text">
+                            <h3>レベル3：平方根の大小</h3>
+                            <p>「\(4\) と \(\sqrt{15}\)」など、数の大きさを比べて不等号で表そう！</p>
+                        </div>
+                    </div>
+                    <div class="clear-badge"><i class="fas fa-crown"></i> CLEAR</div>
+                </div>
+            </div>
+            
+            <!-- 右側：学習履歴 -->
+            <div class="history-section">
+                <div class="history-header">
+                    <div class="history-title"><i class="fas fa-chart-line"></i> あなたの学習履歴</div>
+                    <button class="history-reset-btn" onclick="resetHistory()"><i class="fas fa-trash-alt"></i> 履歴リセット</button>
+                </div>
+                <div class="history-list" id="history-list">
+                    <!-- JavaScriptによって履歴が動的に挿入されます -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ドリル画面 -->
+    <div id="drill-screen" class="screen">
+        <div class="header">
+            <button class="btn btn-home" onclick="goHome()"><i class="fas fa-door-open"></i> もどる</button>
+            <div style="position: relative;">
+                <div class="score-display"><i class="fas fa-star" style="color:#F1C40F;"></i> SCORE: <span id="score">0</span></div>
+                <div class="combo-text" id="combo-display">COMBO!</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="question-number" style="white-space: nowrap; font-size:1.3rem; font-weight:900; color:var(--primary-dark); font-family:'Outfit';">
+                Q <span id="q-num">1</span> <span style="font-size:0.9rem;color:var(--gray);">/ 10</span>
+            </div>
+        </div>
+
+        <div class="problem-area">
+            <div class="math-instruction" id="question-instruction">次の数の平方根を表しなさい</div>
+            <div class="math-display" id="question-display"></div>
+            
+            <!-- ヒントエリア (数直線Canvasも含む) -->
+            <div id="hint-container" class="hint-container"></div>
+
+            <!-- 解答入力エリア -->
+            <div class="input-area" id="input-area">
+                <span class="input-alert-text">※必ず「半角」英数字記号で入力してね！</span>
+                
+                <div class="math-field-container" id="math-field-wrapper" onclick="document.getElementById('answer-input').focus()">
+                    <!-- virtual-keyboard-modeはoffにし、独自のボタンで数式記号の入力を補助 -->
+                    <math-field id="answer-input" virtual-keyboard-mode="off" style="width: 100%; font-size: 2.2rem;"></math-field>
+                </div>
+                
+                <div class="controls" id="controls">
+                    <button class="btn btn-util" onclick="insertCommand('\\pm')">±</button>
+                    <button class="btn btn-util" onclick="insertCommand('\\sqrt{#0}')">√</button>
+                    <button class="btn btn-util" onclick="insertCommand('\\frac{#0}{#?}')"><i class="fas fa-divide"></i> 分数</button>
+                    <button class="btn btn-util" id="btn-less" onclick="insertCommand('<')">&lt;</button>
+                    <button class="btn btn-util" id="btn-greater" onclick="insertCommand('>')">&gt;</button>
+                    
+                    <button class="btn btn-secondary" onclick="showHint()" id="hint-btn"><i class="fas fa-lightbulb"></i> ヒント</button>
+                    <button class="btn btn-primary" onclick="checkAnswerBtn()"><i class="fas fa-paper-plane"></i> 答える！</button>
+                </div>
+                <button class="btn btn-primary" id="next-btn" style="display: none; margin-top: 10px; font-size:1.3rem;" onclick="nextQuestion()">次の問題へ <i class="fas fa-arrow-right"></i></button>
+            </div>
+
+            <!-- 結果フィードバックオーバーレイ -->
+            <div class="feedback-overlay" id="feedback-overlay">
+                <div class="feedback-text animate-pop" id="feedback-icon"></div>
+                <div class="feedback-msg" id="feedback-msg"></div>
+                <div class="hint-math" id="feedback-math" style="margin-bottom: 20px;"></div>
+                <button class="btn btn-primary animate-fade-in" onclick="nextQuestion()" style="font-size:1.3rem; padding: 14px 28px;">次の問題へ <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 結果画面 -->
+    <div id="result-screen" class="screen">
+        <div class="result-container animate-fade-in">
+            <h2 class="result-title">今回のスコア</h2>
+            <div class="result-score" id="final-score">0 / 10</div>
+            <h2 class="result-message" id="result-msg"></h2>
+            
+            <!-- 間違い振り返りリスト -->
+            <div class="mistakes-list" id="mistakes-list"></div>
+
+            <div class="result-actions">
+                <button class="btn btn-outline" id="retry-mistakes-btn" onclick="retryMistakes()"><i class="fas fa-tools"></i> まちがいを復習する</button>
+                <button class="btn btn-primary" onclick="startDrill(currentLevel)"><i class="fas fa-redo-alt"></i> もう一度チャレンジ！</button>
+                <button class="btn btn-home" style="position: static;" onclick="goHome()"><i class="fas fa-door-open"></i> トップへもどる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+   スクリプト読み込み (MathLiveはDOM構築後に安全に初期化するため最後に)
+   ========================================================================== -->
+<script src="questions.js"></script>
+<script src="main.js"></script>
+<script src="https://unpkg.com/mathlive@0.98.4/dist/mathlive.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,848 @@
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Outfit:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@800&display=swap');
+
+/* ==========================================================================
+   デザインシステム & カラーパレット
+   ========================================================================== */
+:root {
+    --primary: #4A90E2;
+    --primary-dark: #357ABD;
+    --secondary: #FF6B6B;
+    --success: #00C9A7;
+    --warning: #FFC75F;
+    --bg: #F0F4F8;
+    --text: #2C3E50;
+    --white: #FFFFFF;
+    --gray: #95A5A6;
+    --gray-light: #E2E8F0;
+    --shadow: 0 8px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 12px 25px rgba(0,0,0,0.15);
+    --gradient-1: linear-gradient(135deg, #A18CD1, #FBC2EB);
+    --gradient-2: linear-gradient(135deg, #84FAB0, #8FD3F4);
+    --gradient-3: linear-gradient(135deg, #FCCB90, #D57EEB);
+    --font-family: 'Outfit', 'BIZ UDPGothic', sans-serif;
+}
+
+/* ==========================================================================
+   ベーススタイル (Chromebook対応・スクロール禁止)
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg);
+    background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #F0F4F8 100%);
+    color: var(--text);
+    overflow: hidden; /* 画面全体のスクロールを完全に禁止 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* 背景に浮遊する数式記号 */
+.bg-symbols {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.bg-symbol {
+    position: absolute;
+    color: rgba(74, 144, 226, 0.15);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    animation: floatup linear infinite;
+}
+
+@keyframes floatup {
+    0% { transform: translateY(110vh) rotate(0deg) scale(0.8); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) rotate(360deg) scale(1.2); opacity: 0; }
+}
+
+/* アプリ本体コンテナ (1366x768に最適化) */
+#app {
+    width: 100%;
+    max-width: 1366px;
+    height: 100%;
+    max-height: 768px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1;
+    border-radius: 0;
+}
+
+@media (min-width: 1367px) {
+    #app {
+        border-radius: 20px;
+    }
+}
+
+/* 画面の基本設計 */
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    padding: 20px 30px;
+    position: relative;
+    max-height: 100%;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop {
+    animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ==========================================================================
+   共通UIパーツ (ボタン・カード)
+   ========================================================================== */
+.btn {
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: var(--font-family);
+}
+
+.btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    box-shadow: 0 6px 0 #2A629A;
+}
+.btn-primary:active {
+    box-shadow: 0 0px 0 #2A629A;
+}
+
+.btn-secondary {
+    background: var(--warning);
+    color: #8A6D3B;
+    box-shadow: 0 6px 0 #D6A848;
+}
+.btn-secondary:active {
+    box-shadow: 0 0px 0 #D6A848;
+}
+
+.btn-outline {
+    background: var(--white);
+    border: 3px solid var(--primary);
+    color: var(--primary);
+    box-shadow: 0 6px 0 #2A629A;
+}
+.btn-outline:active {
+    box-shadow: 0 0px 0 #2A629A;
+}
+
+.btn-home {
+    background: #E2E8F0;
+    color: var(--text);
+    box-shadow: 0 4px 0 #CBD5E1;
+    padding: 8px 18px;
+    font-size: 1rem;
+}
+.btn-home:active {
+    transform: translateY(4px);
+    box-shadow: 0 0px 0 #CBD5E1;
+}
+
+.btn-util {
+    background: #E2E8F0;
+    color: var(--text);
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 12px 22px;
+    box-shadow: 0 5px 0 #CBD5E1;
+}
+.btn-util:active {
+    transform: translateY(5px);
+    box-shadow: 0 0px 0 #CBD5E1;
+}
+
+/* ==========================================================================
+   1. スタート画面 (レイアウト整理)
+   ========================================================================== */
+.title-container {
+    text-align: center;
+    margin-top: 1vh;
+    flex-shrink: 0;
+}
+
+.title {
+    font-size: 2.6rem;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 2px;
+    text-shadow: 3px 3px 0px rgba(74, 144, 226, 0.15);
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #7F8C8D;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+/* スタート画面の左右分割レイアウト */
+.start-content-layout {
+    display: flex;
+    gap: 30px;
+    flex-grow: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.level-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 8px;
+    min-height: 0;
+}
+
+.history-section {
+    flex: 1;
+    background: rgba(248, 250, 252, 0.9);
+    border: 2px solid var(--gray-light);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.history-title {
+    font-size: 1.2rem;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-reset-btn {
+    background: transparent;
+    border: none;
+    color: var(--secondary);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.history-reset-btn:hover {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.history-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 5px;
+}
+
+.history-item {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--gray-light);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.history-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.history-level {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.history-date {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.history-score-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-score {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+.history-status {
+    font-size: 1.2rem;
+}
+
+.history-empty {
+    text-align: center;
+    color: var(--gray);
+    margin: auto;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* レベル選択カード */
+.level-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 15px 20px;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.04);
+    border: 2px solid var(--gray-light);
+    flex-shrink: 0;
+}
+
+.level-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+}
+
+.level-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+}
+#card-level1::before { background: var(--gradient-1); }
+#card-level2::before { background: var(--gradient-2); }
+#card-level3::before { background: var(--gradient-3); }
+
+.level-icon {
+    font-size: 2.2rem;
+    margin-right: 20px;
+    display: inline-block;
+}
+#card-level1 .level-icon { color: #A18CD1; }
+#card-level2 .level-icon { color: #84FAB0; }
+#card-level3 .level-icon { color: #FCCB90; }
+
+.level-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.level-text h3 {
+    font-size: 1.25rem;
+    color: var(--text);
+    margin-bottom: 3px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 800;
+}
+
+.level-text p {
+    color: var(--gray);
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.clear-badge {
+    background: linear-gradient(135deg, var(--success), #27ae60);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-weight: 900;
+    font-size: 0.85rem;
+    display: none;
+    box-shadow: 0 4px 10px rgba(46,204,113,0.25);
+    white-space: nowrap;
+}
+
+.level-card.cleared .clear-badge {
+    display: block;
+}
+
+.level-card.cleared {
+    border-color: var(--success);
+}
+
+/* ==========================================================================
+   2. ドリル画面 (レイアウト & 数式表示)
+   ========================================================================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 2px solid var(--gray-light);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+    flex-shrink: 0;
+}
+
+.progress-container {
+    flex-grow: 1;
+    margin: 0 20px;
+    background: var(--gray-light);
+    height: 12px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    width: 0%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 10px;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+    background-size: 30px 30px;
+    animation: moveStripes 1.2s linear infinite;
+}
+
+@keyframes moveStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 30px 0; }
+}
+
+.score-display {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--primary);
+    font-family: 'Outfit', sans-serif;
+    background: #E1EFFE;
+    padding: 6px 14px;
+    border-radius: 20px;
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.combo-text {
+    font-size: 0.95rem;
+    color: var(--secondary);
+    font-weight: 900;
+    position: absolute;
+    top: -22px;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 10;
+}
+.combo-text.active {
+    top: -12px;
+    opacity: 1;
+    animation: pop 0.3s ease forwards;
+}
+
+/* 問題表示エリア */
+.problem-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.math-instruction {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray);
+    margin-bottom: 6px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.math-display {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    min-height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--white);
+    padding: 8px 25px;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    border: 2px solid var(--gray-light);
+}
+
+/* ==========================================================================
+   3. ヒントエリア & 動的数直線
+   ========================================================================== */
+.hint-container {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 10px;
+    text-align: left;
+    background: #FFFDE7;
+    border: 2px dashed #FBC02D;
+    border-radius: 15px;
+    padding: 12px 18px;
+    display: none;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    flex-shrink: 0;
+    min-height: 0;
+    position: relative;
+}
+
+.hint-step {
+    margin-bottom: 8px;
+    border-bottom: 1px dotted #FFF59D;
+    padding-bottom: 8px;
+}
+.hint-step:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.hint-text {
+    font-weight: 700;
+    color: #C0CA33;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hint-math {
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+/* 動的数直線Canvasコンテナ */
+.number-line-container {
+    width: 100%;
+    margin-top: 10px;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 8px;
+    border: 1px solid #FFF59D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.number-line-canvas {
+    width: 100%;
+    max-width: 700px;
+    height: 80px;
+    background: var(--white);
+}
+
+/* ==========================================================================
+   4. 入力エリア (MathLive & 補助キーボード)
+   ========================================================================== */
+.input-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 5;
+    background: rgba(255,255,255,0.92);
+    padding: 12px 20px;
+    border-radius: 15px;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 800px;
+    border: 1px solid var(--gray-light);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+/* 半角注意書き */
+.input-alert-text {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    font-weight: 700;
+    margin-top: -4px;
+}
+
+.math-field-container {
+    font-size: 1.8rem;
+    padding: 5px 12px;
+    border: 2px solid #CBD5E1;
+    border-radius: 12px;
+    background: #F8FAFC;
+    width: 100%;
+    max-width: 420px;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+    cursor: text;
+    overflow: hidden;
+    min-height: 52px;
+}
+
+.math-field-container:focus-within {
+    border-color: var(--primary);
+    background: var(--white);
+    box-shadow: 0 0 0 5px rgba(74,144,226,0.18), inset 0 2px 5px rgba(0,0,0,0.03);
+    transform: scale(1.01);
+}
+
+math-field {
+    width: 100%;
+    outline: none;
+    border: none;
+    background: transparent;
+}
+
+/* MathLive不要UI隠し */
+math-field::part(menu-toggle) { display: none; }
+math-field::part(virtual-keyboard-toggle) { display: none; }
+
+.controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 正誤判定オーバーレイ */
+.feedback-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+}
+
+.feedback-text {
+    font-size: 5rem;
+    font-weight: 900;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    margin-bottom: 12px;
+}
+
+.feedback-correct { color: var(--success); }
+.feedback-wrong { color: var(--secondary); }
+
+.feedback-msg {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+/* ==========================================================================
+   5. 結果画面 (振り返り & 復習)
+   ========================================================================== */
+.result-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 0;
+    padding-top: 15px;
+}
+
+.result-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text);
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.result-score {
+    font-size: 5.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    color: var(--primary);
+    margin: 0;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.result-message {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    flex-shrink: 0;
+}
+
+/* 誤答一覧 */
+.mistakes-list {
+    width: 95%;
+    max-width: 900px;
+    text-align: left;
+    background: var(--white);
+    border-radius: 20px;
+    padding: 15px 25px;
+    flex-shrink: 1;
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 3px solid var(--gray-light);
+    margin-bottom: 15px;
+    box-shadow: inset 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.mistake-item {
+    border-bottom: 2px dashed var(--gray-light);
+    padding: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.25rem;
+}
+
+.mistake-item:last-child {
+    border-bottom: none;
+}
+
+.mistake-q {
+    font-weight: 700;
+    width: 35%;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.mistake-a {
+    color: var(--success);
+    font-weight: 700;
+    width: 30%;
+    text-align: center;
+}
+
+.mistake-u {
+    color: var(--secondary);
+    width: 35%;
+    text-align: left;
+    padding-left: 15px;
+    font-size: 1.1rem;
+}
+
+.result-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.result-actions .btn {
+    font-size: 1.05rem;
+    padding: 14px 22px;
+    flex: 1;
+    min-width: 180px;
+}
