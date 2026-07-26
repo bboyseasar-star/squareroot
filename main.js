@@ -1,5 +1,5 @@
 /**
- * 鬼リピ 〜平方根〜
+ * 平方根マスター
  * アプリケーション制御ロジック (main.js)
  */
 
@@ -18,6 +18,12 @@ const praiseWords = ["天才！✨", "いいね！👍", "素晴らしい！🎉
 
 // メモリ履歴フォールバック用（localStorageがブロックされている環境用）
 let memoryHistory = [];
+
+function runConfetti(options) {
+    if (typeof window.confetti === 'function') {
+        window.confetti(options);
+    }
+}
 
 // --- 音声効果 (Web Audio API) ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -561,7 +567,7 @@ function checkAnswerBtn() {
         ];
         const selectedTheme = confettiThemes[Math.floor(Math.random() * confettiThemes.length)];
         
-        confetti({
+        runConfetti({
             particleCount: 100,
             spread: 75,
             origin: { y: 0.62 },
@@ -647,8 +653,8 @@ function showResult() {
             const timeLeft = animationEnd - Date.now();
             if (timeLeft <= 0) return clearInterval(interval);
             const particleCount = 50 * (timeLeft / duration);
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            runConfetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+            runConfetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
         }, 250);
         
         // 履歴に合格記録を保存
@@ -697,6 +703,10 @@ function showResult() {
 
 // --- localStorage による学習履歴ダッシュボード ---
 function getHistoryKey() {
+    return 'squareroot-history';
+}
+
+function getLegacyHistoryKey() {
     return 'oniripi-squareroot-history';
 }
 
@@ -706,7 +716,7 @@ function loadHistory() {
     
     let history = [];
     try {
-        const stored = localStorage.getItem(getHistoryKey());
+        const stored = localStorage.getItem(getHistoryKey()) || localStorage.getItem(getLegacyHistoryKey());
         if (stored) {
             history = JSON.parse(stored);
         }
@@ -787,6 +797,7 @@ function resetHistory() {
     if (confirm("これまでの学習履歴とクリア記録をすべて消去します。本当によろしいですか？")) {
         try {
             localStorage.removeItem(getHistoryKey());
+            localStorage.removeItem(getLegacyHistoryKey());
             for (let i = 1; i <= 3; i++) {
                 localStorage.removeItem(`math-drill-squareroot-L${i}`);
             }
